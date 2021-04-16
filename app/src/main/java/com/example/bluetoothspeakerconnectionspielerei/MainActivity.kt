@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         txtDevsOverview = findViewById(R.id.txtDevOverview)
         scanBtn = findViewById(R.id.btnScan)
         txtDevsOverview.text = """Mohandas Karamchand Gandhi (/ˈɡɑːndi, ˈɡændi/;[2] Hindustani:
-            [ˈmoːɦəndaːs ˈkərəmtʃənd ˈɡaːndʱi] (About this soundlisten) asdkjaslkdjlas 
+            [ˈmoːɦəndaːs ˈkərəmtʃənd ˈɡaːndʱi] (Abo this soundlisten) asdkjaslkdjlas 
             sdlöjaksöldkasökdölaskkkkkkkkkkkkkkkkasdasöldäalsäd akakakakakakakaka """
 
     }
