@@ -64,8 +64,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        txtDevsOverview = findViewById(R.id.txtDevOverview)
-        txtDevsOverview.movementMethod = ScrollingMovementMethod()
+
         scanBtn = findViewById(R.id.btnScan)
         scanBtn.setOnClickListener(this);
 
@@ -98,7 +97,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onClick(v: View?) {
-        txtDevsOverview.text = ""
         bluetoothAdapter?.startDiscovery()
         val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
         pairedDevices?.forEach { device ->
@@ -106,7 +104,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             val deviceHardwareAddress = device.address // MAC address
             val text = String.format("%s - %s paired\r\n", deviceName, deviceHardwareAddress)
             val tmp_text = txtDevsOverview.text
-            txtDevsOverview.text = "$tmp_text $text"
+
         }
     }
 
