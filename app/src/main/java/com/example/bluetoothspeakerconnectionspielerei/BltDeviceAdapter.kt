@@ -10,14 +10,14 @@ class BltDeviceAdapter(private val bltDevices: ArrayList<BltDevice>) :
         RecyclerView.Adapter<BltDeviceAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val txtViewDeviceName: TextView = view.findViewById(R.id.txtViewDeviceName)
-        val txtViewDeviceAdress: TextView = view.findViewById(R.id.txtViewDeviceAdress)
-        val txtViewDevicePaired: TextView = view.findViewById(R.id.txtViewDevicePaired)
+        val txtViewDeviceName: TextView = view.findViewById(R.id.txt_view_device_name)
+        val txtViewDeviceAdress: TextView = view.findViewById(R.id.txt_view_device_adress)
+        val txtViewDevicePaired: TextView = view.findViewById(R.id.txt_view_device_paired)
     }
 
-    fun add(position: Int, bltDevice: BltDevice) {
-        bltDevices.add(position, bltDevice)
-        notifyItemInserted(position)
+    fun add(bltDevice: BltDevice) {
+        bltDevices.add(bltDevice)
+        notifyItemInserted(bltDevices.indexOf(bltDevice))
     }
 
     fun remove(postion: Int) {
@@ -39,7 +39,7 @@ class BltDeviceAdapter(private val bltDevices: ArrayList<BltDevice>) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val bltDevice: BltDevice = bltDevices.get(position)
-        holder.txtViewDeviceName.text = bltDevice.devName
+        holder.txtViewDeviceName.text = bltDevice.name
         holder.txtViewDeviceAdress.text = bltDevice.adress
         holder.txtViewDevicePaired.text = bltDevice.paired
     }

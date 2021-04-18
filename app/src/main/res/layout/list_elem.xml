@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="?android:attr/listPreferredItemHeight">
 
     <TextView
-        android:id="@+id/txtViewDeviceName"
+        android:id="@+id/txt_view_device_name"
+        android:background="@color/teal_200"
+        android:textColor="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="TextView" />
 
     <TextView
-        android:id="@+id/txtViewDeviceAdress"
+        android:id="@+id/txt_view_device_adress"
+        android:background="@color/teal_200"
+        android:textColor="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="TextView" />
 
     <TextView
-        android:id="@+id/txtViewDevicePaired"
+        android:id="@+id/txt_view_device_paired"
+        android:background="@color/teal_200"
+        android:textColor="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="TextView" />
