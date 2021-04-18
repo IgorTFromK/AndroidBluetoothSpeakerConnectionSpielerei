@@ -3,7 +3,10 @@ package com.example.bluetoothspeakerconnectionspielerei
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
@@ -25,6 +28,26 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_COARSE_LOCATION)
 
     private var bluetoothAdapter: BluetoothAdapter? =  BluetoothAdapter.getDefaultAdapter()
+    private val receiver = object : BroadcastReceiver() {
+
+        override fun onReceive(context: Context, intent: Intent) {
+            val action: String? = intent.action
+            when(action) {
+                BluetoothDevice.ACTION_FOUND -> {
+                    // Discovery has found a device. Get the BluetoothDevice
+                    // object and its info from the Intent.
+                    val device: BluetoothDevice? =
+                            intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                    val deviceName = device?.name
+                    val deviceHardwareAddress = device?.address // MAC address
+                    val text = String.format("%s - %s\r\n", deviceName, deviceHardwareAddress)
+                    val tmp_text = txtDevsOverview.text
+                    txtDevsOverview.text = "$tmp_text $text"
+                }
+            }
+        }
+    }
+
 
     companion object {
         private const val PERMISSIONS_MULTIPLE_REQUEST = 123
@@ -54,17 +77,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             startActivityForResult(enableBtIntent, 10)
         }
 
-        //checks for paired devices
-        val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
-        pairedDevices?.forEach { device ->
-            val deviceName = device.name
-            val deviceHardwareAddress = device.address // MAC address
-            val text = String.format("%s - %s\r\n", deviceName, deviceHardwareAddress)
-            Log.d(LOG_TAG, text)
-        }
-
-
-
+        val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
+        registerReceiver(receiver, filter)
     }
 
 
@@ -83,10 +97,21 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-
-
-
     override fun onClick(v: View?) {
+        txtDevsOverview.text = ""
+        bluetoothAdapter?.startDiscovery()
+        val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
+        pairedDevices?.forEach { device ->
+            val deviceName = device.name
+            val deviceHardwareAddress = device.address // MAC address
+            val text = String.format("%s - %s paired\r\n", deviceName, deviceHardwareAddress)
+            val tmp_text = txtDevsOverview.text
+            txtDevsOverview.text = "$tmp_text $text"
+        }
+    }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(receiver)
     }
 }
