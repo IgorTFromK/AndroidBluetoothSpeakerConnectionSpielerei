@@ -3,23 +3,17 @@ package com.example.bluetoothspeakerconnectionspielerei
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
-import android.bluetooth.le.BluetoothLeScanner
-import android.bluetooth.le.ScanCallback
-import android.bluetooth.le.ScanResult
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -30,31 +24,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private val permissions = arrayOf(Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_COARSE_LOCATION)
 
-    private var bluetoothAdapter: BluetoothAdapter? = null
-    private var  bluetoothLeScanner: BluetoothLeScanner? = null
-    private var scanning = false
-    private val handler = Handler()
-
-    // Stops scanning after 10 seconds.
-    private val SCAN_PERIOD: Long = 10000
-
-    private var deviceCounter:Int = 0
-
-    // Device scan callback.
-    private val leScanCallback: ScanCallback = object : ScanCallback(){
-        @RequiresApi(Build.VERSION_CODES.R)
-        override fun onScanResult(callbackType: Int, result: ScanResult?) {
-            super.onScanResult(callbackType, result)
-            val device : BluetoothDevice? = result?.device
-            val bluetoothText: String = String.format("%d - %s, %s, %s\r\n", deviceCounter,
-            result?.scanRecord?.deviceName, device?.address, device?.uuids.toString())
-            Log.d(LOG_TAG, bluetoothText);
-            val txtViewText = txtDevsOverview.text
-            txtDevsOverview.text = "$txtViewText $bluetoothText"
-            deviceCounter++;
-
-        }
-    }
+    private var bluetoothAdapter: BluetoothAdapter? =  BluetoothAdapter.getDefaultAdapter()
 
     companion object {
         private const val PERMISSIONS_MULTIPLE_REQUEST = 123
@@ -67,7 +37,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var scanBtn: Button;
 
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -79,15 +48,23 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         ActivityCompat.requestPermissions(this, permissions, PERMISSIONS_MULTIPLE_REQUEST)
 
-        val bluetoothManager = getSystemService(BluetoothManager::class.java)
-        bluetoothAdapter = bluetoothManager?.adapter
 
-        if (bluetoothAdapter != null && !bluetoothAdapter?.isEnabled!!) {
+        if (bluetoothAdapter?.isEnabled == false) {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableBtIntent, 10)
         }
 
-        bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
+        //checks for paired devices
+        val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
+        pairedDevices?.forEach { device ->
+            val deviceName = device.name
+            val deviceHardwareAddress = device.address // MAC address
+            val text = String.format("%s - %s\r\n", deviceName, deviceHardwareAddress)
+            Log.d(LOG_TAG, text)
+        }
+
+
+
     }
 
 
@@ -106,26 +83,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private fun scanLeDevice() {
-        bluetoothLeScanner?.let { scanner ->
-            if (!scanning) { // Stops scanning after a pre-defined scan period.
-                handler.postDelayed({
-                    scanning = false
-                    scanner.stopScan(leScanCallback)
-                }, SCAN_PERIOD)
-                scanning = true
-                scanner.startScan(leScanCallback)
-            } else {
-                scanning = false
-                scanner.stopScan(leScanCallback)
-            }
-        }
-    }
+
 
 
     override fun onClick(v: View?) {
-        deviceCounter = 0
-        txtDevsOverview.text = ""
-        scanLeDevice()
+
     }
 }
