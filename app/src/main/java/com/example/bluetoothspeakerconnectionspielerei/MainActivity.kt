@@ -124,6 +124,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
 
     override fun onClick(v: View?) {
+        deviceCounter = 0
         txtDevsOverview.text = ""
         scanLeDevice()
     }
