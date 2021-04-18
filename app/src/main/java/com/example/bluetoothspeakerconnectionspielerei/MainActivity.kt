@@ -27,12 +27,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private val permissions = arrayOf(Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_COARSE_LOCATION)
 
-    private var bluetoothAdapter: BluetoothAdapter? =  BluetoothAdapter.getDefaultAdapter()
+    private var bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
     private val receiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
             val action: String? = intent.action
-            when(action) {
+            when (action) {
                 BluetoothDevice.ACTION_FOUND -> {
                     // Discovery has found a device. Get the BluetoothDevice
                     // object and its info from the Intent.
@@ -42,7 +42,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     val deviceHardwareAddress = device?.address // MAC address
                     val text = String.format("%s - %s\r\n", deviceName, deviceHardwareAddress)
                     val tmp_text = txtDevsOverview.text
-                    txtDevsOverview.text = "$tmp_text $text"
                 }
             }
         }
@@ -91,7 +90,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 permissionToAccessCoarseLocation = grantResults[2] == PackageManager.PERMISSION_GRANTED
             }
         }
-        if (!permissionForBluetooth|| ! permissionForBluetoothAdmin || !permissionToAccessCoarseLocation) {
+        if (!permissionForBluetooth || !permissionForBluetoothAdmin || !permissionToAccessCoarseLocation) {
             finish()
         }
     }
