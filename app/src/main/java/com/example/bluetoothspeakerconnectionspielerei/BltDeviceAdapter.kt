@@ -1,33 +1,49 @@
 package com.example.bluetoothspeakerconnectionspielerei
 
+import android.bluetooth.BluetoothDevice
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class BltDeviceAdapter(private val bltDevices: ArrayList<BltDevice>) :
+class BltDeviceAdapter(private val bluetoothDevices: ArrayList<BluetoothDevice?>, private val listener: OnItemClickListener) :
         RecyclerView.Adapter<BltDeviceAdapter.ViewHolder>() {
 
+
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val txtViewDeviceName: TextView = view.findViewById(R.id.txt_view_device_name)
-        val txtViewDeviceAdress: TextView = view.findViewById(R.id.txt_view_device_adress)
-        val txtViewDevicePaired: TextView = view.findViewById(R.id.txt_view_device_paired)
+        private val txtViewDeviceName: TextView = view.findViewById(R.id.txt_view_device_name)
+        private val txtViewDeviceAddress: TextView = view.findViewById(R.id.txt_view_device_adress)
+        private val txtViewDevicePaired: TextView = view.findViewById(R.id.txt_view_device_paired)
+
+        fun bind(bluetoothDevice: BluetoothDevice?, listener: OnItemClickListener) {
+            txtViewDeviceName.text = if (bluetoothDevice?.name == null) "No name provided" else bluetoothDevice?.name
+            txtViewDeviceAddress.text = bluetoothDevice?.address
+            txtViewDevicePaired.text = "bisher noch leer"
+            itemView.setOnClickListener(object: View.OnClickListener{
+                override fun onClick(v: View?) {
+                    listener.onItemClick(bluetoothDevice)
+                }
+
+            })
+        }
     }
 
-    fun add(bltDevice: BltDevice) {
-        bltDevices.add(bltDevice)
-        notifyItemInserted(bltDevices.indexOf(bltDevice))
+    fun add(bluetoothDevice: BluetoothDevice?) {
+        bluetoothDevices.add(bluetoothDevice)
+        notifyItemInserted(bluetoothDevices.indexOf(bluetoothDevice))
     }
 
     fun remove(postion: Int) {
-        bltDevices.removeAt(postion)
+        bluetoothDevices.removeAt(postion)
         notifyItemRemoved(postion)
     }
 
-    fun clear(){
-        val size = bltDevices.size
-        bltDevices.clear()
+    fun clear() {
+        val size = bluetoothDevices.size
+        bluetoothDevices.clear()
         notifyItemRangeRemoved(0, size)
     }
 
@@ -38,12 +54,12 @@ class BltDeviceAdapter(private val bltDevices: ArrayList<BltDevice>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val bltDevice: BltDevice = bltDevices.get(position)
-        holder.txtViewDeviceName.text = bltDevice.name
-        holder.txtViewDeviceAdress.text = bltDevice.adress
-        holder.txtViewDevicePaired.text = bltDevice.paired
+        val device: BluetoothDevice? = bluetoothDevices[position]
+        holder.bind(device, this.listener)
     }
 
-    override fun getItemCount() = bltDevices.size
+
+    override fun getItemCount() = bluetoothDevices.size
+
 
 }

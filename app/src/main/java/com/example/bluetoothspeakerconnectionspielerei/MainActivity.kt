@@ -38,11 +38,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     // object and its info from the Intent.
                     val device: BluetoothDevice? =
                             intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                    val deviceName = if (device?.name == null) "Unknown Name" else device?.name
-                    val deviceHardwareAddress = device?.address // MAC addres
-
-                    bltDeviceAdapter.add(BltDevice(deviceName, deviceHardwareAddress, "not paired"))
-                    Log.d(LOG_TAG, "name: " + deviceName + " adress: " + deviceHardwareAddress + "Bluetooth Class " + device?.uuids.toString() + " devicetype: " +device?.type)
+                    bltDeviceAdapter.add(device)
+                    Log.d(LOG_TAG, "name: " + device?.name + " adress: " + device?.address +
+                            "Bluetooth Class " + device?.uuids.toString() + " devicetype: "
+                            + device?.type +" bonded: " + device?.bondState)
 
                 }
             }
@@ -69,7 +68,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         recyclerView = findViewById(R.id.recycler_view)
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = layoutManager
-        bltDeviceAdapter = BltDeviceAdapter(arrayListOf<BltDevice>())
+        bltDeviceAdapter = BltDeviceAdapter(arrayListOf<BluetoothDevice?>(), object: OnItemClickListener{
+            override fun onItemClick(bluetoothDevice: BluetoothDevice?) {
+                Log.d(LOG_TAG, "Click:  " +"name: " + bluetoothDevice?.name + " adress: " + bluetoothDevice?.address +
+                        "Bluetooth Class " + bluetoothDevice?.uuids.toString() + " devicetype: "
+                        + bluetoothDevice?.type +" bonded: " + bluetoothDevice?.bondState)
+            }
+
+        })
+
         recyclerView.adapter = bltDeviceAdapter
         ActivityCompat.requestPermissions(this, permissions, PERMISSIONS_MULTIPLE_REQUEST)
 
@@ -101,11 +108,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         bltDeviceAdapter.clear()
         bluetoothAdapter?.startDiscovery()
         val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
-        pairedDevices?.forEach { device ->
-            val deviceName = device.name
-            val deviceHardwareAddress = device.address // MAC address
-            bltDeviceAdapter.add(BltDevice(deviceName, deviceHardwareAddress, "device paired"))
-        }
+        pairedDevices?.forEach { device -> bltDeviceAdapter.add(device) }
     }
 
     override fun onDestroy() {
