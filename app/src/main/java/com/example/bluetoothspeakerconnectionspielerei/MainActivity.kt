@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
@@ -38,8 +39,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     val device: BluetoothDevice? =
                             intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                     val deviceName = if (device?.name == null) "Unknown Name" else device?.name
-                    val deviceHardwareAddress = device?.address // MAC address
+                    val deviceHardwareAddress = device?.address // MAC addres
+
                     bltDeviceAdapter.add(BltDevice(deviceName, deviceHardwareAddress, "not paired"))
+                    Log.d(LOG_TAG, "name: " + deviceName + " adress: " + deviceHardwareAddress + "Bluetooth Class " + device?.uuids.toString() + " devicetype: " +device?.type)
+
                 }
             }
         }
