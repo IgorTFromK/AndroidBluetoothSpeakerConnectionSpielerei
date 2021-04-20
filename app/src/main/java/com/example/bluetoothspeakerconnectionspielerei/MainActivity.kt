@@ -57,7 +57,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     // View elems
     private lateinit var scanBtn: Button;
     private lateinit var recyclerView: RecyclerView
-    private lateinit var bltDeviceAdapter: BltDeviceAdapter
+    private lateinit var bltDeviceAdapter: BluetoothDeviceAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,13 +69,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         recyclerView = findViewById(R.id.recycler_view)
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = layoutManager
-        bltDeviceAdapter = BltDeviceAdapter(arrayListOf<BluetoothDevice?>(), object: OnItemClickListener{
+        bltDeviceAdapter = BluetoothDeviceAdapter(arrayListOf<BluetoothDevice?>(), object: OnItemClickListener{
             override fun onItemClick(bluetoothDevice: BluetoothDevice?) {
                 Log.d(LOG_TAG, "Click:  " +"name: " + bluetoothDevice?.name + " adress: " + bluetoothDevice?.address +
                         "Bluetooth Class " + bluetoothDevice?.uuids.toString() + " devicetype: "
                         + bluetoothDevice?.type +" bonded: " + bluetoothDevice?.bondState)
             }
-
         })
 
         recyclerView.adapter = bltDeviceAdapter
@@ -104,12 +104,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+
     override fun onClick(v: View?) {
         bltDeviceAdapter.clear()
         bluetoothAdapter?.startDiscovery()
         val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
         pairedDevices?.forEach { device -> bltDeviceAdapter.add(device) }
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
