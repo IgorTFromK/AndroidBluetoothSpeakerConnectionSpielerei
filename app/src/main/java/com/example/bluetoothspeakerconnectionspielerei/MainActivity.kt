@@ -41,17 +41,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     bltDeviceAdapter.add(device)
                     Log.d(LOG_TAG, "name: " + device?.name + " adress: " + device?.address +
                             "Bluetooth Class " + device?.uuids.toString() + " devicetype: "
-                            + device?.type +" bonded: " + device?.bondState)
-
+                            + device?.type +" bonded: " + device?.bondState + " bluetooth class: "
+                            + device?.bluetoothClass?.majorDeviceClass)
                 }
             }
         }
     }
 
-    companion object {
-        private const val PERMISSIONS_MULTIPLE_REQUEST = 123
-        private const val LOG_TAG = "Logging: MainActivity: "
-    }
 
     // Todo: Add Butterknife Framework for dependency injection View Elements
     // View elems
@@ -59,6 +55,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var bltDeviceAdapter: BluetoothDeviceAdapter
 
+
+    companion object {
+        private const val PERMISSIONS_MULTIPLE_REQUEST = 123
+        private const val LOG_TAG = "Logging: MainActivity: "
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +74,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             override fun onItemClick(bluetoothDevice: BluetoothDevice?) {
                 Log.d(LOG_TAG, "Click:  " +"name: " + bluetoothDevice?.name + " adress: " + bluetoothDevice?.address +
                         "Bluetooth Class " + bluetoothDevice?.uuids.toString() + " devicetype: "
-                        + bluetoothDevice?.type +" bonded: " + bluetoothDevice?.bondState)
+                        + bluetoothDevice?.type +" bonded: " + bluetoothDevice?.bondState +
+                        " bluetoothclass: " + bluetoothDevice?.bluetoothClass?.majorDeviceClass)
             }
         })
 
@@ -89,7 +91,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         registerReceiver(receiver, filter)
     }
 
-    //Todo: change the permisson fuck stuff
+    //Todo: refractor permisson stuff
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
