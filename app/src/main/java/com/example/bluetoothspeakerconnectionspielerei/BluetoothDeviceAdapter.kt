@@ -13,12 +13,12 @@ class BluetoothDeviceAdapter(private val bluetoothDevices: ArrayList<BluetoothDe
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val txtViewDeviceName: TextView = view.findViewById(R.id.txt_view_device_name)
-        private val txtViewDeviceAddress: TextView = view.findViewById(R.id.txt_view_device_adress)
+        private val txtViewDeviceAddress: TextView = view.findViewById(R.id.txt_view_device_address)
         private val txtViewDevicePaired: TextView = view.findViewById(R.id.txt_view_device_paired)
 
 
         fun bind(bluetoothDevice: BluetoothDevice?, listener: OnItemClickListener) {
-            txtViewDeviceName.text = if (bluetoothDevice?.name == null) "No name provided" else bluetoothDevice?.name
+            txtViewDeviceName.text = if (bluetoothDevice?.name == null) Constants.UNKNOWN_DEVICE_NAME else bluetoothDevice?.name
             txtViewDeviceAddress.text = bluetoothDevice?.address
             txtViewDevicePaired.text = Constants.BONDING_STATE[bluetoothDevice?.bondState]
             itemView.setOnClickListener { listener.onItemClick(bluetoothDevice) }

@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     bltDeviceAdapter.add(device)
                     Log.d(LOG_TAG, "name: " + device?.name + " adress: " + device?.address +
                             "Bluetooth Class " + device?.uuids.toString() + " devicetype: "
-                            + device?.type +" bonded: " + device?.bondState + " bluetooth class: "
+                            + device?.type + " bonded: " + device?.bondState + " bluetooth class: "
                             + device?.bluetoothClass?.majorDeviceClass)
                 }
             }
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
 
-    // Todo: Add Butterknife Framework for dependency injection View Elements
+    // Todo: Add Butterknife Framework for dependency injection for view elements
     // View elems
     private lateinit var scanBtn: Button;
     private lateinit var recyclerView: RecyclerView
@@ -58,7 +58,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     companion object {
         private const val PERMISSIONS_MULTIPLE_REQUEST = 123
-        private const val LOG_TAG = "Logging: MainActivity: "
+        private const val LOG_TAG = "MainActivity: "
+        const val EXTRA_MESSAGE = "com.example.bluetoothspeakerconnectionspielerei"
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,12 +72,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         recyclerView = findViewById(R.id.recycler_view)
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = layoutManager
-        bltDeviceAdapter = BluetoothDeviceAdapter(arrayListOf<BluetoothDevice?>(), object: OnItemClickListener{
+        bltDeviceAdapter = BluetoothDeviceAdapter(arrayListOf<BluetoothDevice?>(), object : OnItemClickListener {
             override fun onItemClick(bluetoothDevice: BluetoothDevice?) {
-                Log.d(LOG_TAG, "Click:  " +"name: " + bluetoothDevice?.name + " adress: " + bluetoothDevice?.address +
+                Log.d(LOG_TAG, "Click:  " + "name: " + bluetoothDevice?.name + " adress: " + bluetoothDevice?.address +
                         "Bluetooth Class " + bluetoothDevice?.uuids.toString() + " devicetype: "
-                        + bluetoothDevice?.type +" bonded: " + bluetoothDevice?.bondState +
-                        " bluetoothclass: " + bluetoothDevice?.bluetoothClass?.majorDeviceClass)
+                        + bluetoothDevice?.type + " bonded: " + bluetoothDevice?.bondState)
+                val myIntent = Intent(this@MainActivity, BluetoothDeviceInfoActivity::class.java)
+                myIntent.putExtra(EXTRA_MESSAGE, bluetoothDevice) //Optional parameters
+                this@MainActivity.startActivity(myIntent)
+
+
             }
         })
 
@@ -91,7 +97,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         registerReceiver(receiver, filter)
     }
 
-    //Todo: refractor permisson stuff
+    //Todo: refactor permission stuff
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
