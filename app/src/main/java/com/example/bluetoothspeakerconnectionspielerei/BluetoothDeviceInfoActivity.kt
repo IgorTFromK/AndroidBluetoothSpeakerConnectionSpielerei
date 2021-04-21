@@ -17,7 +17,7 @@ class BluetoothDeviceInfoActivity : AppCompatActivity() {
     }
 
     @SuppressLint("LongLogTag")
-    override fun onCreate(savedInstance: Bundle?){
+    override fun onCreate(savedInstance: Bundle?) {
         super.onCreate(savedInstance)
         setContentView(R.layout.activity_bluetooth_device_info_activity)
 
@@ -32,7 +32,7 @@ class BluetoothDeviceInfoActivity : AppCompatActivity() {
         val txtViewUUID = findViewById<TextView>(R.id.txt_view_dev_uuid)
 
         txtViewName.text = if (bluetoothDevice?.name == null) Constants.UNKNOWN_DEVICE_NAME
-            else bluetoothDevice?.name
+        else bluetoothDevice?.name
         txtViewAdress.text = bluetoothDevice?.address
         txtViewBondState.text = Constants.BONDING_STATE[bluetoothDevice?.bondState]
         txtViewType.text = Constants.BLUETOOTH_DEVICE_TYPE[bluetoothDevice?.type]
