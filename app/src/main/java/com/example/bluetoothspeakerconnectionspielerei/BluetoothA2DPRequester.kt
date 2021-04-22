@@ -37,7 +37,7 @@ class BluetoothA2DPRequester
      * @param c the context used to obtain the proxy
      * @param adapter the BluetoothAdapter that should receive the request for proxy
      */
-    fun request(c: Context?, adapter: BluetoothAdapter) {
+    fun request(c: Context?, adapter: BluetoothAdapter)  {
         adapter.getProfileProxy(c, this, BluetoothProfile.A2DP)
     }
 

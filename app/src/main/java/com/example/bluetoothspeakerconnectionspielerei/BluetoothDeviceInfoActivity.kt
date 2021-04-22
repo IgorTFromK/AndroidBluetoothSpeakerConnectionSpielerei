@@ -15,13 +15,16 @@ import com.example.bluetoothspeakerconnectionspielerei.util.Constants
 import java.lang.String
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
-
+//TODO: Load Icon
+//TODO: Switch Activity
+//TODO: BroadcastReceiver getting notified when bluetooth connection is established
 //TODO: Use Butterknife
 class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastReceiver.Callback,
         BluetoothA2DPRequester.Callback, View.OnClickListener {
 
     var mAdapter: BluetoothAdapter? = null
-    var bluetoothDevice : BluetoothDevice? = null
+    var mBluetoothDevice : BluetoothDevice? = null
+
     companion object {
         private const val LOG_TAG = "BluetoothDeviceInfoActivity: "
     }
@@ -31,7 +34,7 @@ class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastRecei
         super.onCreate(savedInstance)
         setContentView(R.layout.activity_bluetooth_device_info_activity)
 
-        bluetoothDevice = intent.extras?.getParcelable(MainActivity.EXTRA_MESSAGE)
+        mBluetoothDevice = intent.extras?.getParcelable(MainActivity.EXTRA_MESSAGE)
                 as? BluetoothDevice
 
         val txtViewName = findViewById<TextView>(R.id.txt_view_dev_name)
@@ -44,23 +47,22 @@ class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastRecei
         val buttonConnect = findViewById<Button>(R.id.button_connect)
         buttonConnect.setOnClickListener(this)
 
-        txtViewName.text = if (bluetoothDevice?.name == null) Constants.UNKNOWN_DEVICE_NAME
-        else bluetoothDevice?.name
-        txtViewAdress.text = bluetoothDevice?.address
-        txtViewBondState.text = Constants.BONDING_STATE[bluetoothDevice?.bondState]
-        txtViewType.text = Constants.BLUETOOTH_DEVICE_TYPE[bluetoothDevice?.type]
-        txtViewMajorClass.text = Constants.BLUETOOTH_DEVICE_MAJOR_CLASS[bluetoothDevice?.bluetoothClass
+        txtViewName.text = if (mBluetoothDevice?.name == null) Constants.UNKNOWN_DEVICE_NAME
+        else mBluetoothDevice?.name
+        txtViewAdress.text = mBluetoothDevice?.address
+        txtViewBondState.text = Constants.BONDING_STATE[mBluetoothDevice?.bondState]
+        txtViewType.text = Constants.BLUETOOTH_DEVICE_TYPE[mBluetoothDevice?.type]
+        txtViewMajorClass.text = Constants.BLUETOOTH_DEVICE_MAJOR_CLASS[mBluetoothDevice?.bluetoothClass
                 ?.majorDeviceClass]
-        val uuids = bluetoothDevice?.uuids
+        val uuids = mBluetoothDevice?.uuids
         if (uuids != null) {
             for (uuid: ParcelUuid in uuids) {
                 val tmp = txtViewUUID.text
                 val formatUUID = String.format("%s\r\n", uuid)
                 txtViewUUID.text = "$tmp   $formatUUID"
             }
-
         }
-        //Store a local reference to the BluetoothAdapter
+
         mAdapter = BluetoothAdapter.getDefaultAdapter()
     }
 
@@ -78,17 +80,26 @@ class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastRecei
     override fun onA2DPProxyReceived(proxy: BluetoothA2dp?) {
         val connect: Method? = getConnectMethod()
 
-        if (connect == null || bluetoothDevice == null) {
+        if (connect == null || mBluetoothDevice == null) {
             return;
         }
-
-        try {
-            connect.isAccessible = true
-            connect.invoke(proxy, bluetoothDevice)
-        } catch (ex: InvocationTargetException) {
-            Log.e(LOG_TAG, "Unable to invoke connect(BluetoothDevice) method on proxy. " + ex.toString())
-        } catch (ex: IllegalAccessException) {
-            Log.e(LOG_TAG, "Illegal Access! $ex")
+        val address = mBluetoothDevice?.address
+        if (proxy != null && address != null) {
+            for(device in proxy.connectedDevices){
+                if(address.compareTo(device.address) == 0){
+                    Log.d(LOG_TAG, "Connection with $address already established !")
+                    //TODO: start here new Activity
+                    return
+                }
+            }
+                try {
+                    connect.isAccessible = true
+                    connect.invoke(proxy, mBluetoothDevice)
+                } catch (ex: InvocationTargetException) {
+                    Log.e(LOG_TAG, "Unable to invoke connect(BluetoothDevice) method on proxy. " + ex.toString())
+                } catch (ex: IllegalAccessException) {
+                    Log.e(LOG_TAG, "Illegal Access! $ex")
+                }
         }
 
     }
@@ -109,7 +120,6 @@ class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastRecei
 
     @SuppressLint("LongLogTag")
     override fun onClick(v: View?) {
-        //Already connected, skip the rest
         if(mAdapter?.isEnabled == true){
             onBluetoothConnected();
             return;
