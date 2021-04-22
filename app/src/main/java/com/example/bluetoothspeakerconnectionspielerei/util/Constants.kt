@@ -1,8 +1,7 @@
-package com.example.bluetoothspeakerconnectionspielerei
+package com.example.bluetoothspeakerconnectionspielerei.util
 
 import android.bluetooth.BluetoothClass
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothHealthCallback
 
 class Constants private constructor() {
     companion object {

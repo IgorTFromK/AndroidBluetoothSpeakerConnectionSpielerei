@@ -74,14 +74,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         recyclerView.layoutManager = layoutManager
         bltDeviceAdapter = BluetoothDeviceAdapter(arrayListOf<BluetoothDevice?>(), object : OnItemClickListener {
             override fun onItemClick(bluetoothDevice: BluetoothDevice?) {
-                Log.d(LOG_TAG, "Click:  " + "name: " + bluetoothDevice?.name + " adress: " + bluetoothDevice?.address +
-                        "Bluetooth Class " + bluetoothDevice?.uuids.toString() + " devicetype: "
-                        + bluetoothDevice?.type + " bonded: " + bluetoothDevice?.bondState)
                 val myIntent = Intent(this@MainActivity, BluetoothDeviceInfoActivity::class.java)
                 myIntent.putExtra(EXTRA_MESSAGE, bluetoothDevice) //Optional parameters
                 this@MainActivity.startActivity(myIntent)
-
-
             }
         })
 
@@ -93,8 +88,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             startActivityForResult(enableBtIntent, 10)
         }
 
-        val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
-        registerReceiver(receiver, filter)
+        //val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
+        //registerReceiver(receiver, filter)
     }
 
     //Todo: refactor permission stuff
@@ -115,7 +110,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         bltDeviceAdapter.clear()
-        bluetoothAdapter?.startDiscovery()
+        //bluetoothAdapter?.startDiscovery()
         val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
         pairedDevices?.forEach { device -> bltDeviceAdapter.add(device) }
     }
@@ -123,6 +118,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(receiver)
+        //unregisterReceiver(receiver)
     }
 }

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.bluetoothspeakerconnectionspielerei.util.Constants
 
 class BluetoothDeviceAdapter(private val bluetoothDevices: ArrayList<BluetoothDevice?>, private val listener: OnItemClickListener) :
         RecyclerView.Adapter<BluetoothDeviceAdapter.ViewHolder>() {
