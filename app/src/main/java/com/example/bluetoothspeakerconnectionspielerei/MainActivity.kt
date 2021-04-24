@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     companion object {
         private const val PERMISSIONS_MULTIPLE_REQUEST = 123
         private const val LOG_TAG = "MainActivity: "
-        const val EXTRA_MESSAGE = "com.example.bluetoothspeakerconnectionspielerei"
+        const val EXTRA_MESSAGE = "com.example.bluetoothspeakerconnectionspielerei.MainActivity"
 
     }
 

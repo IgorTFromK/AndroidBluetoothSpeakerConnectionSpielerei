@@ -4,17 +4,21 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothA2dp
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
+import android.content.Intent
 import android.os.Bundle
 import android.os.ParcelUuid
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.bluetoothspeakerconnectionspielerei.util.Constants
 import java.lang.String
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
+
+
 //TODO: Load Icon
 //TODO: Switch Activity
 //TODO: BroadcastReceiver getting notified when bluetooth connection is established
@@ -22,11 +26,22 @@ import java.lang.reflect.Method
 class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastReceiver.Callback,
         BluetoothA2DPRequester.Callback, View.OnClickListener {
 
-    var mAdapter: BluetoothAdapter? = null
-    var mBluetoothDevice : BluetoothDevice? = null
+    private  var  mAdapter: BluetoothAdapter? = null
+    private  var  mBluetoothDevice : BluetoothDevice? = null
+
+    //View elems
+    private lateinit var txtViewName : TextView
+    private lateinit var txtViewAddress: TextView
+    private lateinit var txtViewBondState : TextView
+    private lateinit var txtViewMajorClass :TextView
+    private lateinit var txtViewType : TextView
+    private lateinit var txtViewUUID : TextView
+    private lateinit var buttonConnect : Button
 
     companion object {
-        private const val LOG_TAG = "BluetoothDeviceInfoActivity: "
+        private const val LOG_TAG = "BluetoothDeviceInfoActivity:"
+        const val EXTRA_MESSAGE = "com.example.bluetoothspeakerconnectionspielerei.BluetoothDeviceActivity"
+        const val SAVE_STATE_BLUETOOTH_DEVICE = "bluetoothDevice"
     }
 
     @SuppressLint("LongLogTag")
@@ -34,26 +49,58 @@ class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastRecei
         super.onCreate(savedInstance)
         setContentView(R.layout.activity_bluetooth_device_info_activity)
 
-        mBluetoothDevice = intent.extras?.getParcelable(MainActivity.EXTRA_MESSAGE)
-                as? BluetoothDevice
+        // Check whether we're recreating a previously destroyed instance
+        if (savedInstance != null) {
+            Log.d(LOG_TAG, "saved Instance != null")
+            with(savedInstance){
+                mBluetoothDevice = getParcelable(SAVE_STATE_BLUETOOTH_DEVICE)
 
-        val txtViewName = findViewById<TextView>(R.id.txt_view_dev_name)
-        val txtViewAdress = findViewById<TextView>(R.id.txt_view_dev_address)
-        val txtViewBondState = findViewById<TextView>(R.id.txt_view_dev_bond_state)
-        val txtViewMajorClass = findViewById<TextView>(R.id.txt_view_dev_major_class)
-        val txtViewType = findViewById<TextView>(R.id.txt_view_dev_type)
-        val txtViewUUID = findViewById<TextView>(R.id.txt_view_dev_uuid)
+            }
+        } else {
+            Log.d(LOG_TAG, "Before " + mBluetoothDevice?.address)
+            val intent_obj = intent.extras?.getParcelable(MainActivity.EXTRA_MESSAGE)
+                    as? BluetoothDevice
+            if(intent_obj != null){
+                mBluetoothDevice = intent_obj
+            }
 
-        val buttonConnect = findViewById<Button>(R.id.button_connect)
+            Log.d(LOG_TAG, "After " + mBluetoothDevice?.address)
+            //Log.d(LOG_TAG, "saved Instance == null")
+        }
+
+        mAdapter = BluetoothAdapter.getDefaultAdapter()
+        initViewElems()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setBluetoothDeviceInfosToTextViewElems()
+    }
+
+    private fun initViewElems(){
+        txtViewName = findViewById(R.id.txt_view_dev_name)
+        txtViewAddress = findViewById(R.id.txt_view_dev_address)
+        txtViewBondState = findViewById(R.id.txt_view_dev_bond_state)
+        txtViewMajorClass = findViewById(R.id.txt_view_dev_major_class)
+        txtViewType = findViewById(R.id.txt_view_dev_type)
+        txtViewUUID = findViewById(R.id.txt_view_dev_uuid)
+
+        buttonConnect = findViewById(R.id.button_connect)
         buttonConnect.setOnClickListener(this)
 
+
+    }
+
+    @SuppressLint("LongLogTag")
+    private fun setBluetoothDeviceInfosToTextViewElems(){
         txtViewName.text = if (mBluetoothDevice?.name == null) Constants.UNKNOWN_DEVICE_NAME
         else mBluetoothDevice?.name
-        txtViewAdress.text = mBluetoothDevice?.address
+        txtViewAddress.text = mBluetoothDevice?.address
         txtViewBondState.text = Constants.BONDING_STATE[mBluetoothDevice?.bondState]
         txtViewType.text = Constants.BLUETOOTH_DEVICE_TYPE[mBluetoothDevice?.type]
         txtViewMajorClass.text = Constants.BLUETOOTH_DEVICE_MAJOR_CLASS[mBluetoothDevice?.bluetoothClass
                 ?.majorDeviceClass]
+        txtViewUUID.text = ""
         val uuids = mBluetoothDevice?.uuids
         if (uuids != null) {
             for (uuid: ParcelUuid in uuids) {
@@ -62,9 +109,24 @@ class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastRecei
                 txtViewUUID.text = "$tmp   $formatUUID"
             }
         }
-
-        mAdapter = BluetoothAdapter.getDefaultAdapter()
+        Log.d(LOG_TAG, "Hier bin ich")
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable(SAVE_STATE_BLUETOOTH_DEVICE, mBluetoothDevice)
+        val a = "WTF"
+        outState.putString("hello", a)
+    }
+
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        val a = savedInstanceState.getString("hello")
+        Toast.makeText(this@BluetoothDeviceInfoActivity, a, Toast.LENGTH_SHORT).show()
+    }
+
+
 
 
     override fun onBluetoothConnected() {
@@ -88,7 +150,8 @@ class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastRecei
             for(device in proxy.connectedDevices){
                 if(address.compareTo(device.address) == 0){
                     Log.d(LOG_TAG, "Connection with $address already established !")
-                    //TODO: start here new Activity
+                    val myIntent = Intent(this@BluetoothDeviceInfoActivity, OsciliatorActivity::class.java)
+                    this.startActivity(myIntent)
                     return
                 }
             }

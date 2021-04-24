@@ -18,7 +18,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".BluetoothDeviceInfoActivity"
+            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity">
+        </activity>
+        <activity android:name=".OsciliatorActivity"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".BluetoothDeviceInfoActivity">
         </activity>
 
     </application>
