@@ -13,6 +13,8 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.example.bluetoothspeakerconnectionspielerei.util.Constants
 import java.lang.String
 import java.lang.reflect.InvocationTargetException
@@ -29,7 +31,7 @@ class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastRecei
     private  var  mAdapter: BluetoothAdapter? = null
     private  var  mBluetoothDevice : BluetoothDevice? = null
 
-    //View elems
+    //View elements
     private lateinit var txtViewName : TextView
     private lateinit var txtViewAddress: TextView
     private lateinit var txtViewBondState : TextView
@@ -48,29 +50,16 @@ class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastRecei
     override fun onCreate(savedInstance: Bundle?) {
         super.onCreate(savedInstance)
         setContentView(R.layout.activity_bluetooth_device_info_activity)
-
-        // Check whether we're recreating a previously destroyed instance
-        if (savedInstance != null) {
-            Log.d(LOG_TAG, "saved Instance != null")
-            with(savedInstance){
-                mBluetoothDevice = getParcelable(SAVE_STATE_BLUETOOTH_DEVICE)
-
-            }
-        } else {
-            Log.d(LOG_TAG, "Before " + mBluetoothDevice?.address)
-            val intent_obj = intent.extras?.getParcelable(MainActivity.EXTRA_MESSAGE)
-                    as? BluetoothDevice
-            if(intent_obj != null){
-                mBluetoothDevice = intent_obj
-            }
-
-            Log.d(LOG_TAG, "After " + mBluetoothDevice?.address)
-            //Log.d(LOG_TAG, "saved Instance == null")
+        val intent_obj = intent.extras?.getParcelable(MainActivity.EXTRA_MESSAGE)
+                as? BluetoothDevice
+        if(intent_obj != null){
+            mBluetoothDevice = intent_obj
         }
 
         mAdapter = BluetoothAdapter.getDefaultAdapter()
         initViewElems()
     }
+
 
     override fun onResume() {
         super.onResume()
@@ -87,8 +76,6 @@ class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastRecei
 
         buttonConnect = findViewById(R.id.button_connect)
         buttonConnect.setOnClickListener(this)
-
-
     }
 
     @SuppressLint("LongLogTag")
@@ -195,5 +182,18 @@ class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastRecei
             Log.e(LOG_TAG, "Unable to enable Bluetooth. Is Airplane Mode enabled?");
         }
     }
+
+    @SuppressLint("LongLogTag")
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(LOG_TAG, "Wurde zerstört")
+    }
+
+    @SuppressLint("LongLogTag")
+    override fun onStop() {
+        super.onStop()
+        Log.d(LOG_TAG, "Wurde gestoppt")
+    }
+
 
 }
