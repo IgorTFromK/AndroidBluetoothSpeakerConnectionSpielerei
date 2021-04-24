@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothA2dp
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.os.ParcelUuid
 import android.util.Log
@@ -13,60 +16,75 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import com.example.bluetoothspeakerconnectionspielerei.util.Constants
 import java.lang.String
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 
-
-//TODO: Load Icon
-//TODO: Switch Activity
-//TODO: BroadcastReceiver getting notified when bluetooth connection is established
 //TODO: Use Butterknife
 class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastReceiver.Callback,
-        BluetoothA2DPRequester.Callback, View.OnClickListener {
+    BluetoothA2DPRequester.Callback, View.OnClickListener {
 
-    private  var  mAdapter: BluetoothAdapter? = null
-    private  var  mBluetoothDevice : BluetoothDevice? = null
+    private var mAdapter: BluetoothAdapter? = null
+    private var mBluetoothDevice: BluetoothDevice? = null
 
     //View elements
-    private lateinit var txtViewName : TextView
+    private lateinit var txtViewName: TextView
     private lateinit var txtViewAddress: TextView
-    private lateinit var txtViewBondState : TextView
-    private lateinit var txtViewMajorClass :TextView
-    private lateinit var txtViewType : TextView
-    private lateinit var txtViewUUID : TextView
-    private lateinit var buttonConnect : Button
+    private lateinit var txtViewBondState: TextView
+    private lateinit var txtViewMajorClass: TextView
+    private lateinit var txtViewType: TextView
+    private lateinit var txtViewUUID: TextView
+    private lateinit var buttonConnect: Button
+
+    private val receiver = object : BroadcastReceiver() {
+
+        override fun onReceive(context: Context, intent: Intent) {
+            val action: kotlin.String? = intent.action
+            when (action) {
+                BluetoothDevice.ACTION_ACL_CONNECTED -> {
+                    Toast.makeText(
+                        this@BluetoothDeviceInfoActivity,
+                        "Connection  established",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    switchActivity()
+                }
+            }
+        }
+    }
 
     companion object {
-        private const val LOG_TAG = "BluetoothDeviceInfoActivity:"
-        const val EXTRA_MESSAGE = "com.example.bluetoothspeakerconnectionspielerei.BluetoothDeviceActivity"
+        private const val LOG_TAG = "BLDIActivity:"
+        const val EXTRA_MESSAGE =
+            "com.example.bluetoothspeakerconnectionspielerei.BluetoothDeviceActivity"
         const val SAVE_STATE_BLUETOOTH_DEVICE = "bluetoothDevice"
     }
 
-    @SuppressLint("LongLogTag")
+
     override fun onCreate(savedInstance: Bundle?) {
         super.onCreate(savedInstance)
         setContentView(R.layout.activity_bluetooth_device_info_activity)
         val intent_obj = intent.extras?.getParcelable(MainActivity.EXTRA_MESSAGE)
                 as? BluetoothDevice
-        if(intent_obj != null){
+        if (intent_obj != null) {
             mBluetoothDevice = intent_obj
         }
 
         mAdapter = BluetoothAdapter.getDefaultAdapter()
         initViewElems()
+
+        val filter = IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED)
+        registerReceiver(receiver, filter)
     }
 
 
     override fun onResume() {
         super.onResume()
-        setBluetoothDeviceInfosToTextViewElems()
+        renderViewElems()
     }
 
-    private fun initViewElems(){
+    private fun initViewElems() {
         txtViewName = findViewById(R.id.txt_view_dev_name)
         txtViewAddress = findViewById(R.id.txt_view_dev_address)
         txtViewBondState = findViewById(R.id.txt_view_dev_bond_state)
@@ -78,14 +96,15 @@ class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastRecei
         buttonConnect.setOnClickListener(this)
     }
 
-    @SuppressLint("LongLogTag")
-    private fun setBluetoothDeviceInfosToTextViewElems(){
+
+    private fun renderViewElems() {
         txtViewName.text = if (mBluetoothDevice?.name == null) Constants.UNKNOWN_DEVICE_NAME
         else mBluetoothDevice?.name
         txtViewAddress.text = mBluetoothDevice?.address
         txtViewBondState.text = Constants.BONDING_STATE[mBluetoothDevice?.bondState]
         txtViewType.text = Constants.BLUETOOTH_DEVICE_TYPE[mBluetoothDevice?.type]
-        txtViewMajorClass.text = Constants.BLUETOOTH_DEVICE_MAJOR_CLASS[mBluetoothDevice?.bluetoothClass
+        txtViewMajorClass.text =
+            Constants.BLUETOOTH_DEVICE_MAJOR_CLASS[mBluetoothDevice?.bluetoothClass
                 ?.majorDeviceClass]
         txtViewUUID.text = ""
         val uuids = mBluetoothDevice?.uuids
@@ -113,19 +132,22 @@ class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastRecei
         Toast.makeText(this@BluetoothDeviceInfoActivity, a, Toast.LENGTH_SHORT).show()
     }
 
-
+    private fun switchActivity() {
+        val myIntent = Intent(this@BluetoothDeviceInfoActivity, OsciliatorActivity::class.java)
+        this.startActivity(myIntent)
+    }
 
 
     override fun onBluetoothConnected() {
         BluetoothA2DPRequester(this).request(this, mAdapter!!);
     }
 
-    @SuppressLint("LongLogTag")
+
     override fun onBluetoothError() {
         Log.e(LOG_TAG, "There was an error enabling the Bluetooth Adapter.");
     }
 
-    @SuppressLint("LongLogTag")
+
     override fun onA2DPProxyReceived(proxy: BluetoothA2dp?) {
         val connect: Method? = getConnectMethod()
 
@@ -134,24 +156,25 @@ class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastRecei
         }
         val address = mBluetoothDevice?.address
         if (proxy != null && address != null) {
-            for(device in proxy.connectedDevices){
-                if(address.compareTo(device.address) == 0){
+            for (device in proxy.connectedDevices) {
+                if (address.compareTo(device.address) == 0) {
                     Log.d(LOG_TAG, "Connection with $address already established !")
-                    val myIntent = Intent(this@BluetoothDeviceInfoActivity, OsciliatorActivity::class.java)
-                    this.startActivity(myIntent)
+                    switchActivity()
                     return
                 }
             }
-                try {
-                    connect.isAccessible = true
-                    connect.invoke(proxy, mBluetoothDevice)
-                } catch (ex: InvocationTargetException) {
-                    Log.e(LOG_TAG, "Unable to invoke connect(BluetoothDevice) method on proxy. " + ex.toString())
-                } catch (ex: IllegalAccessException) {
-                    Log.e(LOG_TAG, "Illegal Access! $ex")
-                }
+            try {
+                connect.isAccessible = true
+                connect.invoke(proxy, mBluetoothDevice)
+            } catch (ex: InvocationTargetException) {
+                Log.e(
+                    LOG_TAG,
+                    "Unable to invoke connect(BluetoothDevice) method on proxy. " + ex.toString()
+                )
+            } catch (ex: IllegalAccessException) {
+                Log.e(LOG_TAG, "Illegal Access! $ex")
+            }
         }
-
     }
 
     /**
@@ -160,39 +183,46 @@ class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastRecei
      */
     @SuppressLint("LongLogTag")
     private fun getConnectMethod(): Method? {
-         try {
-         return   BluetoothA2dp::class.java.getDeclaredMethod("connect", BluetoothDevice::class.java)
+        try {
+            return BluetoothA2dp::class.java.getDeclaredMethod(
+                "connect",
+                BluetoothDevice::class.java
+            )
         } catch (ex: NoSuchMethodException) {
-             Log.e(LOG_TAG, "Unable to find connect(BluetoothDevice) method in BluetoothA2dp proxy.");
-             return null
+            Log.e(
+                LOG_TAG,
+                "Unable to find connect(BluetoothDevice) method in BluetoothA2dp proxy."
+            );
+            return null
         }
     }
 
-    @SuppressLint("LongLogTag")
+
     override fun onClick(v: View?) {
-        if(mAdapter?.isEnabled == true){
+        if (mAdapter?.isEnabled == true) {
             onBluetoothConnected();
             return;
         }
         //Check if we're allowed to enable Bluetooth. If so, listen for a
         //successful enabling
-        if(mAdapter?.enable() == true){
+        if (mAdapter?.enable() == true) {
             BluetoothBroadcastReceiver.register(this, this);
         } else {
             Log.e(LOG_TAG, "Unable to enable Bluetooth. Is Airplane Mode enabled?");
         }
     }
 
-    @SuppressLint("LongLogTag")
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(LOG_TAG, "Wurde zerstört")
-    }
 
-    @SuppressLint("LongLogTag")
     override fun onStop() {
         super.onStop()
         Log.d(LOG_TAG, "Wurde gestoppt")
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(LOG_TAG, "Wurde zerstört")
+        unregisterReceiver(receiver)
     }
 
 
