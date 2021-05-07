@@ -56,10 +56,10 @@ class MicAudioRecord(
         thread.start()
     }
 
+
     /**
      * Stops thread and also recording audio
      */
-
     fun stopRecording() {
         recordingFlag = false
         if (audioRecord != null) {
@@ -72,11 +72,10 @@ class MicAudioRecord(
         }
     }
 
+
     /**
      * Reading Audiosamples from Microphone/AudioRecord object is done here
      */
-
-
     override fun run() {
         TODO("Not yet implemented")
         val buffer = FloatArray(audioBufferSize)

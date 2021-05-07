@@ -8,8 +8,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bluetoothspeakerconnectionspielerei.util.Constants
 
-class BluetoothDeviceAdapter(private val bluetoothDevices: ArrayList<BluetoothDevice?>, private val listener: OnItemClickListener) :
-        RecyclerView.Adapter<BluetoothDeviceAdapter.ViewHolder>() {
+class BluetoothDeviceAdapter(
+    private val bluetoothDevices: ArrayList<BluetoothDevice?>,
+    private val listener: OnItemClickListener
+) :
+    RecyclerView.Adapter<BluetoothDeviceAdapter.ViewHolder>() {
 
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -19,7 +22,8 @@ class BluetoothDeviceAdapter(private val bluetoothDevices: ArrayList<BluetoothDe
 
 
         fun bind(bluetoothDevice: BluetoothDevice?, listener: OnItemClickListener) {
-            txtViewDeviceName.text = if (bluetoothDevice?.name == null) Constants.UNKNOWN_DEVICE_NAME else bluetoothDevice?.name
+            txtViewDeviceName.text =
+                if (bluetoothDevice?.name == null) Constants.UNKNOWN_DEVICE_NAME else bluetoothDevice?.name
             txtViewDeviceAddress.text = bluetoothDevice?.address
             txtViewDevicePaired.text = Constants.BONDING_STATE[bluetoothDevice?.bondState]
             itemView.setOnClickListener { listener.onItemClick(bluetoothDevice) }
@@ -42,7 +46,7 @@ class BluetoothDeviceAdapter(private val bluetoothDevices: ArrayList<BluetoothDe
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.list_elem, parent, false)
+            .inflate(R.layout.list_elem, parent, false)
         return ViewHolder(view)
     }
 
