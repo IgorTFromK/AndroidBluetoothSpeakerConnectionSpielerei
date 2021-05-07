@@ -23,7 +23,7 @@
 
             android:parentActivityName=".MainActivity">
         </activity>
-        <activity android:name=".OsciliatorActivity"
+        <activity android:name=".VoiceDistorterActivity"
             android:screenOrientation="portrait"
             android:parentActivityName=".BluetoothDeviceInfoActivity">
         </activity>

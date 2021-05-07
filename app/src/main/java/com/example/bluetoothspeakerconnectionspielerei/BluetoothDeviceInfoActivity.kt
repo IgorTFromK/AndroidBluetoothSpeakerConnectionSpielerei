@@ -133,7 +133,7 @@ class BluetoothDeviceInfoActivity : AppCompatActivity(), BluetoothBroadcastRecei
     }
 
     private fun switchActivity() {
-        val myIntent = Intent(this@BluetoothDeviceInfoActivity, OsciliatorActivity::class.java)
+        val myIntent = Intent(this@BluetoothDeviceInfoActivity, VoiceDistorterActivity::class.java)
         this.startActivity(myIntent)
     }
 

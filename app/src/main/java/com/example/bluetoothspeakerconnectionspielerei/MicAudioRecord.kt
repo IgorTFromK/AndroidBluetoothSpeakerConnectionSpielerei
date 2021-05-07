@@ -6,6 +6,10 @@ import android.media.MediaRecorder
 import android.util.Log
 import java.util.concurrent.BlockingQueue
 
+/**
+ * MicAudioRecorder takes care of Reading Audiosamples from Microphone
+ **/
+
 class MicAudioRecord(
     sampleQueue: BlockingQueue<FloatArray>,
     sampleRate: Int,
@@ -39,6 +43,10 @@ class MicAudioRecord(
         Log.i(LOG_TAG, "AudioRecorder initialized");
     }
 
+    /**
+     * Starts thread and also recording audio
+     */
+
     fun startRecording() {
         thread = Thread(this)
         recordingFlag = true
@@ -48,9 +56,13 @@ class MicAudioRecord(
         thread.start()
     }
 
-    fun stopRecording(){
+    /**
+     * Stops thread and also recording audio
+     */
+
+    fun stopRecording() {
         recordingFlag = false
-        if(audioRecord != null){
+        if (audioRecord != null) {
             Log.i(LOG_TAG, "AudioRecorder stopped");
             audioRecord?.stop();
             audioRecord?.release();
@@ -60,14 +72,20 @@ class MicAudioRecord(
         }
     }
 
+    /**
+     * Reading Audiosamples from Microphone/AudioRecord object is done here
+     */
+
 
     override fun run() {
         TODO("Not yet implemented")
         val buffer = FloatArray(audioBufferSize)
         var i: Int = 0
-        while(recordingFlag){
-            val read: Int? = audioRecord?.read(buffer, 0, audioBufferSize,
-                AudioRecord.READ_BLOCKING)
+        while (recordingFlag) {
+            val read: Int? = audioRecord?.read(
+                buffer, 0, audioBufferSize,
+                AudioRecord.READ_BLOCKING
+            )
             /**
             if (i % 1 == 0) {
             Log.i(LOG_TAG, read + " Samples was read ; " + Arrays.toString(buffer));

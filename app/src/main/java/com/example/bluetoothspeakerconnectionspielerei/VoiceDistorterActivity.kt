@@ -3,11 +3,11 @@ package com.example.bluetoothspeakerconnectionspielerei
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
-class OsciliatorActivity : AppCompatActivity() {
+class VoiceDistorterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstance: Bundle?) {
         super.onCreate(savedInstance)
-        setContentView(R.layout.oscilator_activity)
+        setContentView(R.layout.voice_distorter_activity)
 
 
     }
