@@ -5,9 +5,17 @@
     android:background="@color/teal_700"
     android:orientation="vertical">
 
-    <Button
-        android:id="@+id/button"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="122dp"
-        android:text="START the Mic" />
+        android:layout_height="30dp"
+        android:layout_weight="0" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton"
+        android:layout_width="match_parent"
+        android:layout_height="85dp"
+        android:background="@color/teal_200"
+        android:textColor="@color/white"
+        android:textOff="START"
+        android:textOn="STOP" />
 </LinearLayout>

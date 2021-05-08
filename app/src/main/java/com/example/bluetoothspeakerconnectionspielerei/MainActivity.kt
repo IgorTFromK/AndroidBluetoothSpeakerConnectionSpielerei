@@ -55,12 +55,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var bltDeviceAdapter: BluetoothDeviceAdapter
 
-
     companion object {
         private const val PERMISSIONS_MULTIPLE_REQUEST = 123
         private const val LOG_TAG = "MainActivity: "
         const val EXTRA_MESSAGE = "com.example.bluetoothspeakerconnectionspielerei.MainActivity"
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,7 +85,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableBtIntent, 10)
         }
-
         //val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
         //registerReceiver(receiver, filter)
     }

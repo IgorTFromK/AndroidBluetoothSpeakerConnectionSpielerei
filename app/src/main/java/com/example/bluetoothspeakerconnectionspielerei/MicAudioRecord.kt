@@ -4,6 +4,7 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
+import java.util.*
 import java.util.concurrent.BlockingQueue
 
 /**
@@ -17,14 +18,14 @@ class MicAudioRecord(
 ) : Runnable {
 
 
-    private var audioRecord: AudioRecord? = null
-    private lateinit var thread: Thread
-    private var sampleQueue: BlockingQueue<FloatArray> = sampleQueue
-    private var sampleRate: Int = sampleRate
-    private var audioBufferSize: Int = audioBufferSize
+    private var mAudioRecord: AudioRecord? = null
+    private lateinit var mThread: Thread
+    private var mSampleQueue: BlockingQueue<FloatArray> = sampleQueue
+    private var mSampleRate: Int = sampleRate
+    private var mAudioBufferSize: Int = audioBufferSize
 
     @Volatile
-    private var recordingFlag: Boolean = false;
+    private var mRecordingFlag: Boolean = false;
 
     companion object {
         private const val LOG_TAG = "MicAudioRecord: "
@@ -32,11 +33,11 @@ class MicAudioRecord(
 
 
     private fun initAudioRecorder() {
-        audioRecord = AudioRecord(
-            MediaRecorder.AudioSource.MIC, sampleRate, AudioFormat.CHANNEL_IN_MONO,
-            AudioFormat.ENCODING_PCM_FLOAT, audioBufferSize * Float.SIZE_BYTES
+        mAudioRecord = AudioRecord(
+            MediaRecorder.AudioSource.MIC, mSampleRate, AudioFormat.CHANNEL_IN_MONO,
+            AudioFormat.ENCODING_PCM_FLOAT, mAudioBufferSize * Float.SIZE_BYTES
         )
-        if (audioRecord?.state != AudioRecord.STATE_INITIALIZED) {
+        if (mAudioRecord?.state != AudioRecord.STATE_INITIALIZED) {
             throw RuntimeException("Failed to initialize recorder")
         }
         Log.i(LOG_TAG, "-------------------------");
@@ -48,12 +49,12 @@ class MicAudioRecord(
      */
 
     fun startRecording() {
-        thread = Thread(this)
-        recordingFlag = true
+        mThread = Thread(this)
+        mRecordingFlag = true
         initAudioRecorder()
         Log.i(LOG_TAG, "AudioRecorder started");
-        audioRecord?.startRecording()
-        thread.start()
+        mAudioRecord?.startRecording()
+        mThread.start()
     }
 
 
@@ -61,12 +62,12 @@ class MicAudioRecord(
      * Stops thread and also recording audio
      */
     fun stopRecording() {
-        recordingFlag = false
-        if (audioRecord != null) {
+        mRecordingFlag = false
+        if (mAudioRecord != null) {
             Log.i(LOG_TAG, "AudioRecorder stopped");
-            audioRecord?.stop();
-            audioRecord?.release();
-            sampleQueue?.clear();
+            mAudioRecord?.stop();
+            mAudioRecord?.release();
+            mSampleQueue?.clear();
             Log.i(LOG_TAG, "AudioRecorder stopped");
 
         }
@@ -77,24 +78,23 @@ class MicAudioRecord(
      * Reading Audiosamples from Microphone/AudioRecord object is done here
      */
     override fun run() {
-        TODO("Not yet implemented")
-        val buffer = FloatArray(audioBufferSize)
+        val buffer = FloatArray(mAudioBufferSize)
         var i: Int = 0
-        while (recordingFlag) {
-            val read: Int? = audioRecord?.read(
-                buffer, 0, audioBufferSize,
+        while (mRecordingFlag) {
+            val read: Int? = mAudioRecord?.read(
+                buffer, 0, mAudioBufferSize,
                 AudioRecord.READ_BLOCKING
             )
-            /**
+
             if (i % 1 == 0) {
-            Log.i(LOG_TAG, read + " Samples was read ; " + Arrays.toString(buffer));
-            Log.i(LOG_TAG, read + " Samples was read ");
-            Log.i(LOG_TAG, "Number of reads: " + i + " Queuesize: " + sampleQueue.size() + " Buffersize " + buffer.length);
-            Log.i(LOG_TAG, "Min Buffersize: " + audioRecordMinBufferSize);
+                Log.i(LOG_TAG, "${read}  Samples was read ; " + Arrays.toString(buffer))
+                Log.i(
+                    LOG_TAG,
+                    "Number of reads: ${i} Queuesize: ${mSampleQueue.size} Buffersize ${buffer.size}"
+                )
             }
-             */
         }
-        sampleQueue.offer(buffer)
+        mSampleQueue.offer(buffer)
         i++
     }
 }
