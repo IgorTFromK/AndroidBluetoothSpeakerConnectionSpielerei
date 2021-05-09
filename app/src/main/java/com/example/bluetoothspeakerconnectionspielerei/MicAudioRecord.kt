@@ -33,15 +33,21 @@ class MicAudioRecord(
 
 
     private fun initAudioRecorder() {
+        val bufferSize: Int = AudioRecord.getMinBufferSize(mSampleRate, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT)
+        Log.i(LOG_TAG, "Buffersize: ${bufferSize}")
         mAudioRecord = AudioRecord(
             MediaRecorder.AudioSource.MIC, mSampleRate, AudioFormat.CHANNEL_IN_MONO,
-            AudioFormat.ENCODING_PCM_FLOAT, mAudioBufferSize * Float.SIZE_BYTES
-        )
+            AudioFormat.ENCODING_PCM_FLOAT,  mAudioBufferSize * Float.SIZE_BYTES)
+
+        /*
         if (mAudioRecord?.state != AudioRecord.STATE_INITIALIZED) {
             throw RuntimeException("Failed to initialize recorder")
         }
+
+         */
         Log.i(LOG_TAG, "-------------------------");
         Log.i(LOG_TAG, "AudioRecorder initialized");
+        Log.i(LOG_TAG, "State: ${mAudioRecord?.state}")
     }
 
     /**
@@ -86,15 +92,16 @@ class MicAudioRecord(
                 AudioRecord.READ_BLOCKING
             )
 
-            if (i % 1 == 0) {
+            if (i % 10 == 0) {
                 Log.i(LOG_TAG, "${read}  Samples was read ; " + Arrays.toString(buffer))
                 Log.i(
                     LOG_TAG,
                     "Number of reads: ${i} Queuesize: ${mSampleQueue.size} Buffersize ${buffer.size}"
                 )
             }
+            mSampleQueue.offer(buffer)
+            i++
         }
-        mSampleQueue.offer(buffer)
-        i++
+
     }
 }

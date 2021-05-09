@@ -24,8 +24,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var permissionForBluetooth = false
     private var permissionForBluetoothAdmin = false
     private var permissionToAccessCoarseLocation = false
+    private var permissionAudioRecord = false
     private val permissions = arrayOf(Manifest.permission.BLUETOOTH,
-            Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_COARSE_LOCATION)
+            Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.RECORD_AUDIO)
 
     private var bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
     private val receiver = object : BroadcastReceiver() {
@@ -97,6 +98,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 permissionForBluetooth = grantResults[0] == PackageManager.PERMISSION_GRANTED
                 permissionForBluetoothAdmin = grantResults[1] == PackageManager.PERMISSION_GRANTED
                 permissionToAccessCoarseLocation = grantResults[2] == PackageManager.PERMISSION_GRANTED
+                permissionAudioRecord = grantResults[3] == PackageManager.PERMISSION_GRANTED
+
             }
         }
         if (!permissionForBluetooth || !permissionForBluetoothAdmin || !permissionToAccessCoarseLocation) {
