@@ -15,8 +15,8 @@ class VoiceDistorterActivity : AppCompatActivity(), View.OnClickListener {
     private val mSampleQueue1: BlockingQueue<FloatArray> = LinkedBlockingQueue()
     private val mSampleQueue2: BlockingQueue<FloatArray> = LinkedBlockingQueue()
     private val mMicAudioRecord : MicAudioRecord = MicAudioRecord(mSampleQueue1,44100,mBufferSize)
-    private val mAudioProcessor: AudioProcessor = AudioProcessor(mSampleQueue1, mSampleQueue2, 44100, mBufferSize)
-    private val mAudioOutput: AudioOutput = AudioOutput(mSampleQueue2, 44100, mBufferSize )
+    //private val mAudioProcessor: AudioProcessor = AudioProcessor(mSampleQueue1, mSampleQueue2, 44100, mBufferSize)
+    private val mAudioOutput: AudioOutput = AudioOutput(mSampleQueue1, 44100, mBufferSize )
 
     companion object {
         private  val LOG_TAG = "VoiceDistorterActivity: "
@@ -34,11 +34,11 @@ class VoiceDistorterActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         if(mRecordingButton.isChecked){
             mMicAudioRecord.startRecording()
-            mAudioProcessor.startAudioProcessing()
+            //mAudioProcessor.startAudioProcessing()
             mAudioOutput.startPlaying()
         } else{
             mMicAudioRecord.stopRecording()
-            mAudioProcessor.stopAudioProcessing()
+            //mAudioProcessor.stopAudioProcessing()
             mAudioOutput.stopPlaying()
         }
     }
